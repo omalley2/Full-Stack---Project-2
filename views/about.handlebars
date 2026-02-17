@@ -1,0 +1,115 @@
+<style>
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .kpi-card {
+        background: #f8fbff;
+        border: 1px solid #e6edf7;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .kpi-label {
+        color: #3a4b5c;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+    }
+
+    .kpi-value {
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: #152231;
+    }
+
+    .about-list {
+        margin-left: 1.25rem;
+        margin-top: 0.75rem;
+        color: #2c3e50;
+    }
+
+    .about-list li {
+        margin-bottom: 0.4rem;
+    }
+
+    .section-subtext {
+        color: #5d6d7e;
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
+    }
+</style>
+
+<div class="card">
+    <h2>ℹ️ About</h2>
+    <p class="section-subtext">Project overview, data footprint, and API surface health at a glance.</p>
+</div>
+
+<div class="card">
+    <h2>Data & API Snapshot</h2>
+    <div class="dashboard-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">API Endpoints</div>
+            <div class="kpi-value">{{aboutMetrics.apiCount}}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Bank Performance Rows</div>
+            <div class="kpi-value">{{aboutMetrics.bankRows}}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Economic Data Rows</div>
+            <div class="kpi-value">{{aboutMetrics.economicRows}}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Saved Strategy Rows</div>
+            <div class="kpi-value">{{aboutMetrics.strategyRows}}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Bank Performance Columns</div>
+            <div class="kpi-value">{{aboutMetrics.bankColumns}}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Economic Data Columns</div>
+            <div class="kpi-value">{{aboutMetrics.economicColumns}}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Latest Bank Data Date</div>
+            <div class="kpi-value">{{formatDate aboutMetrics.latestBankDate}}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Latest Economic Data Date</div>
+            <div class="kpi-value">{{formatDate aboutMetrics.latestEconomicDate}}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">API Calls (Since Server Start)</div>
+            <div class="kpi-value">{{aboutMetrics.totalApiCalls}}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Last API Call Time</div>
+            <div class="kpi-value" style="font-size: 1rem;">{{aboutMetrics.lastApiCallAt}}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Recommended Next Metrics</h2>
+    <ul class="about-list">
+        <li>Loan-to-Deposit Ratio trend by bank and peer median.</li>
+        <li>Deposit cost trend versus loan growth by bank.</li>
+        <li>Credit risk pressure index: delinquency + charge-off movement by bank.</li>
+        <li>ROA vs Tier 1 Capital scatter plot for risk-return positioning.</li>
+        <li>Rolling 4-quarter volatility for net income and ROE consistency.</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h2>API Catalog</h2>
+    <ul class="about-list">
+        {{#each apiEndpoints}}
+        <li>{{this}}</li>
+        {{/each}}
+    </ul>
+</div>

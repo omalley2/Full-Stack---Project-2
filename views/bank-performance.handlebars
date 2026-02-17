@@ -1,0 +1,479 @@
+<style>
+    .card h2 {
+        margin-bottom: 0.75rem;
+    }
+
+    .card h2 + .control-row,
+    .card h2 + .bank-controls-layout,
+    .card h2 + .perf-hist-controls-layout,
+    .card h2 + .trend-analysis-layout,
+    .card h2 + .section-subtext,
+    .card h2 + ul {
+        margin-top: 0;
+    }
+
+    .control-row-tight {
+        margin-top: 0;
+        margin-bottom: 0.75rem;
+        gap: 1rem;
+        align-items: end;
+        flex-wrap: wrap;
+    }
+
+    .control-row-dates {
+        margin-top: 0.75rem;
+        margin-bottom: 0.75rem;
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .kpi-card {
+        background: #f8fbff;
+        border: 1px solid #e6edf7;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .kpi-label {
+        color: #3a4b5c;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+    }
+
+    .kpi-value {
+        font-size: 1.5rem;
+        font-weight: 400;
+        color: #152231;
+    }
+
+    .kpi-value-compact {
+        font-size: 1rem;
+    }
+
+    .kpi-value-multiline {
+        font-size: 0.95rem;
+        line-height: 1.35;
+    }
+
+    .control-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+        margin-top: 1rem;
+    }
+
+    .control-row label {
+        font-weight: 700;
+        color: #2c3e50;
+        font-size: 0.95rem;
+    }
+
+    .control-row > div {
+        display: flex;
+        flex-direction: column;
+        width: 220px;
+    }
+
+    .control-row select[multiple] {
+        min-width: 320px;
+        min-height: 120px;
+    }
+
+    .control-row select:not([multiple]) {
+        width: 100%;
+    }
+
+    .chart-wrap {
+        position: relative;
+        height: 340px;
+    }
+
+    .chart-wrap-rhythm {
+        margin-top: 0.75rem;
+    }
+
+    .chart-wrap-bank-composite {
+        height: 300px;
+    }
+
+    .chart-wrap-performance {
+        height: 320px;
+    }
+
+    .bank-controls-layout {
+        display: grid;
+        grid-template-columns: minmax(300px, 1fr) minmax(360px, 1fr);
+        gap: 1rem;
+        align-items: start;
+        margin-top: 0.75rem;
+    }
+
+    .bank-controls-left .control-row {
+        margin-top: 0;
+        margin-bottom: 0.75rem;
+    }
+
+    .composite-banks-box {
+        border: 1px solid #d7dde2;
+        border-radius: 8px;
+        padding: 0.9rem;
+        background: #f8fbff;
+    }
+
+    .composite-banks-box-no-margin {
+        margin-bottom: 0;
+    }
+
+    .composite-banks-title {
+        font-weight: 700;
+        color: #2c3e50;
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .composite-banks-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0.4rem 0.8rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .composite-banks-list label {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.95rem;
+    }
+
+    .section-divider {
+        border: 0;
+        border-top: 1px solid #d7dde2;
+        margin: 0.75rem 0;
+    }
+
+    .kpi-grid-divider {
+        grid-column: 1 / -1;
+        border: 0;
+        border-top: 1px solid #d7dde2;
+        margin: 0.1rem 0;
+    }
+
+    .section-subtext {
+        color: #5d6d7e;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .asof-note {
+        color: #5d6d7e;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .asof-note-economic {
+        margin-top: 0.75rem;
+    }
+
+    .asof-note-bank {
+        margin-top: 0.5rem;
+    }
+
+    .perf-hist-controls-layout {
+        display: grid;
+        grid-template-columns: minmax(280px, 340px) minmax(360px, 1fr);
+        gap: 1rem;
+        align-items: start;
+        margin-bottom: 0.75rem;
+    }
+
+    .perf-hist-left-controls .control-row {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .trend-analysis-layout {
+        display: grid;
+        grid-template-columns: minmax(360px, 1fr) minmax(360px, 1fr);
+        gap: 1rem;
+        align-items: start;
+    }
+
+    .trend-analysis-left .control-row {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    @media (max-width: 980px) {
+        .bank-controls-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .perf-hist-controls-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .trend-analysis-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+{{#if availableBankCount}}
+    {{#if (lt availableBankCount 3)}}
+    <div class="card">
+        <div class="alert alert-warning">
+            <strong>Limited bank coverage detected:</strong> only {{availableBankCount}} bank{{#if (eq availableBankCount 1)}}{{else}}s{{/if}} currently exist in your loaded dataset.
+            Add more banks to <strong>data/bank_data.csv</strong> and run <strong>python3 db/seed_database.py</strong> to expand comparison charts.
+        </div>
+    </div>
+    {{/if}}
+{{/if}}
+
+{{#if banks}}
+<div class="card" id="bank-dashboard-root" data-selected-cert="{{selectedCert}}">
+    <h2>Bank Dashboard Metrics</h2>
+    <div class="bank-controls-layout">
+        <div class="bank-controls-left">
+            <div class="control-row">
+                <label for="selected-bank">Primary Bank</label>
+                <select id="selected-bank" name="cert">
+                    <option value="" {{#unless selectedCert}}selected{{/unless}}>-- Select Bank --</option>
+                    {{#each banks}}
+                    <option value="{{cert_number}}" {{#if (eq cert_number ../selectedCert)}}selected{{/if}}>
+                            {{bank_name}}
+                    </option>
+                    {{/each}}
+                </select>
+            </div>
+
+            <div class="control-row">
+                <label for="bank-composite-metric">Composite Metric</label>
+                <select id="bank-composite-metric">
+                    <option value="total_loans_qoq" selected>Loans QoQ Growth</option>
+                    <option value="total_loans_yoy">Loans YoY Growth</option>
+                    <option value="roa_qoq">ROA QoQ Change</option>
+                    <option value="roa_yoy">ROA YoY Change</option>
+                </select>
+            </div>
+
+            <div class="control-row control-row-tight">
+                <div>
+                    <label for="bank-composite-asof-date">Date</label>
+                    <select id="bank-composite-asof-date"></select>
+                </div>
+            </div>
+        </div>
+
+        <div class="composite-banks-box">
+            <div class="composite-banks-title">Composite Banks (equal-weighted average)</div>
+            <div class="composite-banks-list">
+                {{#each compositeBanks}}
+                <label><input type="checkbox" name="composite-bank" value="{{cert_number}}" {{#if is_default_composite}}checked{{/if}}> {{bank_name}}</label>
+                {{else}}
+                {{#each banks}}
+                <label><input type="checkbox" name="composite-bank" value="{{cert_number}}" {{#if is_default_composite}}checked{{/if}}> {{bank_name}}</label>
+                {{/each}}
+                {{/each}}
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">Selected Bank</div>
+            <div class="kpi-value kpi-value-compact" id="kpi-bank-name">--</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Loans QoQ Growth</div>
+            <div class="kpi-value" id="kpi-bank-loans-qoq">--</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Loans YoY Growth</div>
+            <div class="kpi-value" id="kpi-bank-loans-yoy">--</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">ROA QoQ Change</div>
+            <div class="kpi-value" id="kpi-bank-roa-qoq">--</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">ROA YoY Change</div>
+            <div class="kpi-value" id="kpi-bank-roa-yoy">--</div>
+        </div>
+
+        <hr class="kpi-grid-divider">
+
+        <div class="kpi-card">
+            <div class="kpi-label">Composite Banks</div>
+            <div class="kpi-value kpi-value-multiline" id="kpi-bank-composite">--</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Composite Loans QoQ Growth</div>
+            <div class="kpi-value" id="kpi-comp-loans-qoq">--</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Composite Loans YoY Growth</div>
+            <div class="kpi-value" id="kpi-comp-loans-yoy">--</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Composite ROA QoQ Change</div>
+            <div class="kpi-value" id="kpi-comp-roa-qoq">--</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Composite ROA YoY Change</div>
+            <div class="kpi-value" id="kpi-comp-roa-yoy">--</div>
+        </div>
+    </div>
+
+    <p id="kpi-bank-asof-note" class="asof-note asof-note-bank">
+        * Bank metrics as-of date will display after data loads.
+    </p>
+
+    <hr class="section-divider">
+
+    <div class="control-row control-row-dates">
+        <div>
+            <label for="bank-chart-start-date">Start Date</label>
+            <select id="bank-chart-start-date"></select>
+        </div>
+        <div>
+            <label for="bank-chart-end-date">End Date</label>
+            <select id="bank-chart-end-date"></select>
+        </div>
+    </div>
+
+    <div class="chart-wrap chart-wrap-rhythm chart-wrap-bank-composite">
+        <canvas id="bankCompositeIndexChart"></canvas>
+    </div>
+</div>
+{{/if}}
+
+{{#if performanceData}}
+<div class="card">
+    <h2>Performance History</h2>
+    <p class="section-subtext">Histogram view across selected banks at the chosen date</p>
+
+    <div class="perf-hist-controls-layout">
+        <div class="perf-hist-left-controls">
+            <div class="control-row control-row-tight">
+                <div>
+                    <label for="perf-primary-bank">Primary Bank</label>
+                    <select id="perf-primary-bank">
+                        <option value="" {{#unless selectedCert}}selected{{/unless}}>-- Select Bank --</option>
+                        {{#each banks}}
+                        <option value="{{cert_number}}" {{#if (eq cert_number ../selectedCert)}}selected{{/if}}>{{bank_name}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div>
+                    <label for="perf-metric">Metric</label>
+                    <select id="perf-metric">
+                        <option value="total_assets">Total Assets</option>
+                        <option value="total_deposits" selected>Total Deposits</option>
+                        <option value="total_loans">Total Loans</option>
+                        <option value="net_income">Net Income</option>
+                        <option value="roa">ROA</option>
+                        <option value="roe">ROE</option>
+                        <option value="nim">Net Interest Margin (NIM)</option>
+                        <option value="efficiency_ratio">Efficiency Ratio</option>
+                        <option value="tier1_capital_ratio">Tier 1 Capital Ratio</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="perf-date">Date</label>
+                    <select id="perf-date"></select>
+                </div>
+            </div>
+        </div>
+
+        <div class="composite-banks-box composite-banks-box-no-margin">
+            <div class="composite-banks-title">Select Banks:</div>
+            <div class="composite-banks-list" id="perf-hist-banks-list">
+                {{#each compositeBanks}}
+                <label><input type="checkbox" name="perf-hist-bank" value="{{cert_number}}" {{#if is_default_composite}}checked{{/if}}> {{bank_name}}</label>
+                {{else}}
+                {{#each banks}}
+                <label><input type="checkbox" name="perf-hist-bank" value="{{cert_number}}" {{#if is_default_composite}}checked{{/if}}> {{bank_name}}</label>
+                {{/each}}
+                {{/each}}
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-wrap chart-wrap-rhythm chart-wrap-performance">
+        <canvas id="performanceHistogramChart"></canvas>
+    </div>
+</div>
+{{/if}}
+
+<div class="card">
+    <h2>Trend By Bank</h2>
+    <div class="trend-analysis-layout">
+        <div class="trend-analysis-left">
+            <div class="control-row control-row-tight">
+                <div>
+                    <label for="trend-analysis-bank">Bank</label>
+                    <select id="trend-analysis-bank">
+                        {{#each banks}}
+                        <option value="{{cert_number}}" {{#if (eq cert_number 6560)}}selected{{/if}}>{{bank_name}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+
+            <div class="control-row control-row-tight">
+                <div>
+                    <label for="trend-analysis-metric">Metric</label>
+                    <select id="trend-analysis-metric">
+                        <option value="total_loans" selected>Total Bank Loans</option>
+                        <option value="total_deposits">Total Bank Deposits</option>
+                        <option value="net_income">Net Income</option>
+                        <option value="roa">Bank ROA</option>
+                        <option value="roe">Bank ROE</option>
+                        <option value="nim">Net Interest Margin (NIM)</option>
+                        <option value="tier1_capital_ratio">Tier 1 Capital Ratio</option>
+                        <option value="efficiency_ratio">Efficiency Ratio</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="control-row control-row-tight">
+                <div>
+                    <label for="economic-chart-start-date">Start Date</label>
+                    <select id="economic-chart-start-date"></select>
+                </div>
+                <div>
+                    <label for="economic-chart-end-date">End Date</label>
+                    <select id="economic-chart-end-date"></select>
+                </div>
+            </div>
+        </div>
+
+        <div class="composite-banks-box composite-banks-box-no-margin">
+            <div class="composite-banks-title">Select Banks</div>
+            <div class="composite-banks-list" id="trend-composite-banks-list">
+                {{#each compositeBanks}}
+                <label><input type="checkbox" name="trend-composite-bank" value="{{cert_number}}" {{#if is_default_composite}}checked{{/if}}> {{bank_name}}</label>
+                {{else}}
+                {{#each banks}}
+                <label><input type="checkbox" name="trend-composite-bank" value="{{cert_number}}" {{#if is_default_composite}}checked{{/if}}> {{bank_name}}</label>
+                {{/each}}
+                {{/each}}
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-wrap chart-wrap-rhythm">
+        <canvas id="gdpTrendChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/js/bankDashboard.js"></script>

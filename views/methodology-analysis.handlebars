@@ -1,0 +1,306 @@
+<style>
+  .analysis-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #ffffff;
+    overflow: hidden;
+  }
+
+  .analysis-card-header {
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0.7rem 0.9rem;
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  .analysis-card-body {
+    padding: 0.85rem;
+  }
+
+  .analysis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 1.25rem;
+    align-items: start;
+    margin-top: 1rem;
+  }
+
+  .code-toggle {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f8fafc;
+  }
+
+  .code-toggle summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 0.65rem 0.8rem;
+    font-weight: 600;
+    color: #334155;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .code-toggle summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .code-toggle summary::before {
+    content: '▶';
+    margin-right: 0.45rem;
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+
+  .code-toggle[open] summary::before {
+    content: '▼';
+  }
+
+  .snippet-block {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 0.9rem;
+    margin: 0;
+    max-height: 320px;
+    overflow: auto;
+    font-size: 0.86rem;
+    line-height: 1.5;
+  }
+
+  .graph-note {
+    font-size: 0.83rem;
+    color: #6b7280;
+    margin-top: 0.45rem;
+  }
+</style>
+
+<div class="card">
+  <h2>Capstone Methodology & Analysis</h2>
+  <p class="alert alert-info">
+    This page summarizes the methodology and findings from the Intro_DS_Capstone project so you can review the analysis directly inside the app.
+  </p>
+</div>
+
+<div class="card">
+  <h2>Methodology Workflow</h2>
+  <ol style="padding-left: 1.5rem; line-height: 1.9;">
+    {{#each methodologySteps}}
+      <li>{{this}}</li>
+    {{/each}}
+  </ol>
+</div>
+
+<div class="card">
+  <h2>Key Findings</h2>
+  <ul style="padding-left: 1.5rem; line-height: 1.9;">
+    {{#each keyFindings}}
+      <li>{{this}}</li>
+    {{/each}}
+  </ul>
+</div>
+
+<div class="card">
+  <h2>Code Snippets from Analysis</h2>
+
+  <div class="analysis-grid">
+    <div>
+      <div class="analysis-card">
+        <div class="analysis-card-header">XGBoost Holdout Evaluation</div>
+        <div class="analysis-card-body">
+          <details class="code-toggle" open>
+            <summary>Code snippet</summary>
+            <pre class="snippet-block"><code>from pathlib import Path
+from xgboost import XGBRegressor
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+
+xgb_model = XGBRegressor(
+    n_estimators=300,
+    max_depth=4,
+    learning_rate=0.05,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    random_state=42,
+)
+
+xgb_model.fit(X_train, y_train)
+y_pred_xgb = xgb_model.predict(X_test)
+
+rmse_xgb = mean_squared_error(y_test, y_pred_xgb, squared=False)
+mae_xgb = mean_absolute_error(y_test, y_pred_xgb)
+print({"model": "xgboost", "rmse": rmse_xgb, "mae": mae_xgb})</code></pre>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="analysis-card">
+        <div class="analysis-card-header">Graph: Holdout RMSE by Model</div>
+        <div class="analysis-card-body">
+          <svg width="100%" viewBox="0 0 {{rmseChart.width}} {{rmseChart.height}}" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;">
+        <line x1="{{rmseChart.axisX1}}" y1="{{rmseChart.axisY1}}" x2="{{rmseChart.axisX2}}" y2="{{rmseChart.axisY2}}" stroke="#9ca3af" stroke-width="1" />
+        {{#each rmseChart.bars}}
+          <text x="12" y="{{this.labelY}}" fill="#1f2937" font-size="12">{{this.model}}</text>
+          <rect x="{{../rmseChart.leftPad}}" y="{{this.y}}" width="{{this.barWidth}}" height="{{../rmseChart.barHeight}}" fill="#2563eb" rx="4" />
+          <text x="{{this.valueX}}" y="{{this.labelY}}" fill="#1f2937" font-size="12">{{this.rmse}}</text>
+        {{/each}}
+        <text x="{{rmseChart.axisXText}}" y="{{rmseChart.axisYText}}" fill="#4b5563" font-size="12">RMSE (lower is better)</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="analysis-grid">
+    <div>
+      <div class="analysis-card">
+        <div class="analysis-card-header">Prophet with Macroeconomic Regressors</div>
+        <div class="analysis-card-body">
+          <details class="code-toggle" open>
+            <summary>Code snippet</summary>
+            <pre class="snippet-block"><code>from sklearn.metrics import mean_squared_error
+from prophet import Prophet
+
+prophet_df = monthly_df.rename(columns={"date": "ds", "target_roa": "y"})
+train_prophet = prophet_df[prophet_df["ds"] &lt; split_date].copy()
+test_prophet = prophet_df[prophet_df["ds"] &gt;= split_date].copy()
+
+model = Prophet(yearly_seasonality=True)
+for reg in ["unemployment_rate", "fed_funds_rate", "yield_curve"]:
+    model.add_regressor(reg)
+
+model.fit(train_prophet[["ds", "y", "unemployment_rate", "fed_funds_rate", "yield_curve"]])
+forecast = model.predict(test_prophet[["ds", "unemployment_rate", "fed_funds_rate", "yield_curve"]])
+
+prophet_rmse = mean_squared_error(test_prophet["y"], forecast["yhat"], squared=False)
+print({"model": "prophet", "rmse": prophet_rmse})</code></pre>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="analysis-card">
+        <div class="analysis-card-header">Graph: Prophet vs Baseline RMSE Context</div>
+        <div class="analysis-card-body">
+          <svg width="100%" viewBox="0 0 520 180" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;">
+        <line x1="70" y1="140" x2="490" y2="140" stroke="#9ca3af" stroke-width="1" />
+        <rect x="90" y="98" width="220" height="26" fill="#2563eb" rx="4" />
+        <text x="96" y="115" fill="#ffffff" font-size="12">Winsorized Linear (0.3531)</text>
+
+        <rect x="90" y="48" width="337" height="26" fill="#ef4444" rx="4" />
+        <text x="96" y="65" fill="#ffffff" font-size="12">Prophet (0.5409)</text>
+
+        <text x="70" y="160" fill="#4b5563" font-size="12">Holdout RMSE comparison</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="analysis-grid">
+    <div>
+      <div class="analysis-card">
+        <div class="analysis-card-header">KMeans Clustering + Silhouette Selection</div>
+        <div class="analysis-card-body">
+          <details class="code-toggle" open>
+            <summary>Code snippet</summary>
+            <pre class="snippet-block"><code>from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+
+cluster_features = ["roa", "roe", "nim", "efficiency_ratio", "tier1_capital_ratio"]
+X_cluster = latest_bank_snapshot[cluster_features].dropna()
+X_scaled = StandardScaler().fit_transform(X_cluster)
+
+scores = {}
+for k in range(2, 7):
+    km = KMeans(n_clusters=k, random_state=42, n_init=10)
+    labels = km.fit_predict(X_scaled)
+    scores[k] = silhouette_score(X_scaled, labels)
+
+best_k = max(scores, key=scores.get)
+final_km = KMeans(n_clusters=best_k, random_state=42, n_init=10)
+latest_bank_snapshot.loc[X_cluster.index, "cluster"] = final_km.fit_predict(X_scaled)</code></pre>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="analysis-card">
+        <div class="analysis-card-header">Graph: Cluster Scatter (PCA projection)</div>
+        <div class="analysis-card-body">
+          <svg width="100%" viewBox="0 0 {{clusterScatter.width}} {{clusterScatter.height}}" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;">
+        {{#each clusterScatter.yTicks}}
+          <line x1="{{../clusterScatter.axisX1}}" y1="{{this.y}}" x2="{{../clusterScatter.axisX2}}" y2="{{this.y}}" stroke="#e5e7eb" stroke-width="1" />
+        {{/each}}
+        {{#each clusterScatter.xTicks}}
+          <line x1="{{this.x}}" y1="{{../clusterScatter.axisY1}}" x2="{{this.x}}" y2="{{../clusterScatter.axisYY2}}" stroke="#eef2f7" stroke-width="1" />
+        {{/each}}
+
+        <line x1="{{clusterScatter.axisX1}}" y1="{{clusterScatter.axisY1}}" x2="{{clusterScatter.axisX2}}" y2="{{clusterScatter.axisY2}}" stroke="#9ca3af" stroke-width="1" />
+        <line x1="{{clusterScatter.axisX1}}" y1="{{clusterScatter.axisY1}}" x2="{{clusterScatter.axisYX2}}" y2="{{clusterScatter.axisYY2}}" stroke="#9ca3af" stroke-width="1" />
+
+        {{#each clusterScatter.points}}
+          <circle cx="{{this.x}}" cy="{{this.y}}" r="5" fill="{{this.color}}" stroke="#ffffff" stroke-width="1.5" />
+        {{/each}}
+
+        <text x="{{clusterScatter.xTitleX}}" y="{{clusterScatter.xTitleY}}" fill="#4b5563" font-size="12">PC1</text>
+        <text x="{{clusterScatter.yTitleX}}" y="{{clusterScatter.yTitleY}}" fill="#4b5563" font-size="12">PC2</text>
+
+        {{#each clusterScatter.xTicks}}
+          <text x="{{this.x}}" y="{{../clusterScatter.height}}" fill="#6b7280" font-size="10" text-anchor="middle">{{this.value}}</text>
+        {{/each}}
+        {{#each clusterScatter.yTicks}}
+          <text x="8" y="{{this.y}}" fill="#6b7280" font-size="10">{{this.value}}</text>
+        {{/each}}
+          </svg>
+
+          <p class="graph-note">Points represent banks; see cluster membership table below for names.</p>
+
+          <div style="display:flex;gap:0.8rem;flex-wrap:wrap;margin-top:0.6rem;">
+            {{#each clusterLegend}}
+              <div style="display:flex;align-items:center;gap:0.35rem;font-size:0.86rem;color:#374151;">
+                <span style="width:10px;height:10px;border-radius:50%;background:{{this.color}};display:inline-block;"></span>
+                <span>{{this.name}}</span>
+              </div>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Cluster Membership (k = 3)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Cluster</th>
+        <th>Banks</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each clusterSummary}}
+        <tr>
+          <td><strong>{{this.name}}</strong></td>
+          <td>{{this.banks}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Reproducibility Notes</h2>
+  <ul style="padding-left: 1.5rem; line-height: 1.9;">
+    <li>Primary notebook: <code>Intro_DS_Capstone.ipynb</code></li>
+    <li>Capstone README: <code>README_Intro_DS_Capstone.md</code></li>
+    <li>CSV exports: <code>data/exports/</code> (bank performance, economic data, joined active panel)</li>
+    <li>Export script: <code>scripts/export_postgres_csv.py</code></li>
+  </ul>
+</div>
+

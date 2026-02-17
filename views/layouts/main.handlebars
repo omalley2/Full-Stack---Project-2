@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Lending Strategy Optimizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .navbar h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #3498db;
+        }
+        
+        .nav-links a.active {
+            color: #3498db;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-box.blue {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+        
+        .stat-box.green {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        }
+        
+        .stat-box.orange {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+        
+        .stat-box.red {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        th {
+            background: #34495e;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .positive {
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        .negative {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        select, button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        select {
+            background: white;
+            cursor: pointer;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .pagination a {
+            padding: 0.5rem 1rem;
+            background: #ecf0f1;
+            color: #2c3e50;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        
+        .pagination a:hover {
+            background: #3498db;
+            color: white;
+        }
+        
+        .pagination a.active {
+            background: #2c3e50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>🏦 Bank Lending Strategy Optimizer</h1>
+        <ul class="nav-links">
+            <li><a href="/bank-performance" class="{{#if isBank}}active{{/if}}">Bank Performance</a></li>
+            <li><a href="/us-economic-performance" class="{{#if isEconomic}}active{{/if}}">US Economic Performance</a></li>
+            <li><a href="/methodology-analysis" class="{{#if isMethodology}}active{{/if}}">Methodology & Analysis</a></li>
+            <li><a href="/strategies" class="{{#if isStrategies}}active{{/if}}">Bank Notes</a></li>
+            <li><a href="/about" class="{{#if isAbout}}active{{/if}}">About</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        {{{body}}}
+    </div>
+    
+    <script>
+        // Add any global JavaScript here
+    </script>
+</body>
+</html>

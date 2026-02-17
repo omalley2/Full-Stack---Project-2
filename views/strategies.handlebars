@@ -1,0 +1,203 @@
+<style>
+    .section-subtext {
+        color: #5d6d7e;
+        font-size: 0.92rem;
+        margin-bottom: 1rem;
+    }
+
+    .strategies-layout {
+        display: grid;
+        grid-template-columns: minmax(300px, 420px) 1fr;
+        gap: 1rem;
+        align-items: start;
+    }
+
+    .no-bottom-margin {
+        margin-bottom: 0;
+    }
+
+    .panel-title {
+        margin-bottom: 0.75rem;
+        color: #2c3e50;
+    }
+
+    .form-row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        margin-bottom: 0.85rem;
+    }
+
+    .form-row label {
+        font-weight: 700;
+        color: #2c3e50;
+        font-size: 0.92rem;
+    }
+
+    .form-row input,
+    .form-row textarea,
+    .form-row select {
+        width: 100%;
+        padding: 0.55rem 0.65rem;
+        border: 1px solid #d7dde2;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        font-family: inherit;
+    }
+
+    #bank-note-id-display {
+        background-color: #f4f6f8;
+        color: #6c7a89;
+        cursor: not-allowed;
+    }
+
+    .form-row input[readonly] {
+        background-color: #f4f6f8;
+        color: #6c7a89;
+        cursor: not-allowed;
+    }
+
+    .prompt-text {
+        color: #8a949e;
+    }
+
+    .form-row textarea {
+        min-height: 88px;
+        resize: vertical;
+    }
+
+    .button-row {
+        display: flex;
+        gap: 0.6rem;
+        margin-top: 0.25rem;
+    }
+
+    .button-secondary {
+        background: #7f8c8d;
+    }
+
+    .button-danger {
+        background: #c0392b;
+    }
+
+    .status-message {
+        min-height: 1.5rem;
+        font-size: 0.9rem;
+        margin-top: 0.6rem;
+    }
+
+    .status-success {
+        color: #1f7a3e;
+    }
+
+    .status-error {
+        color: #c0392b;
+    }
+
+    .table-actions {
+        display: flex;
+        gap: 0.45rem;
+    }
+
+    .table-actions button {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.85rem;
+    }
+
+    @media (max-width: 980px) {
+        .strategies-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="card">
+    <h2>Bank Notes</h2>
+    <p class="section-subtext">Create, view, edit, and delete bank notes.</p>
+
+    <div class="strategies-layout" id="strategies-root">
+        <div class="card no-bottom-margin">
+            <h3 id="bank-note-form-title" class="panel-title">Create Bank Note</h3>
+
+            <form id="bank-note-form">
+                <input type="hidden" id="bank-note-id" name="strategy_id" value="">
+
+                <div class="form-row">
+                    <label for="bank-note-id-display">ID</label>
+                    <input type="text" id="bank-note-id-display" value="Auto-generated" readonly>
+                </div>
+
+                <div class="form-row">
+                    <label for="user-id">User Name</label>
+                    <input type="text" id="user-id" name="user_id" maxlength="50" required value="Enter your name" class="prompt-text">
+                </div>
+
+                <div class="form-row">
+                    <label for="bank-note-title">Subject</label>
+                    <input type="text" id="bank-note-title" name="strategy_name" maxlength="100" required value="Add a bank note subject here." class="prompt-text">
+                </div>
+
+                <div class="form-row">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" maxlength="1000" class="prompt-text">Make notes about bank lending or economic trends here.</textarea>
+                </div>
+
+                <div class="button-row">
+                    <button type="submit" id="save-button">Save</button>
+                    <button type="button" id="cancel-edit-button" class="button-secondary">Cancel</button>
+                </div>
+            </form>
+
+            <div id="bank-note-status" class="status-message"></div>
+        </div>
+
+        <div class="card no-bottom-margin">
+            <h3 class="panel-title">Saved Bank Notes</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User Name</th>
+                        <th>Bank Note</th>
+                        <th>Description</th>
+                        <th>Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="bank-note-table-body">
+                    {{#if strategies.length}}
+                        {{#each strategies}}
+                        <tr data-id="{{id}}">
+                            <td>{{id}}</td>
+                            <td>{{user_name}}</td>
+                            <td>{{strategy_name}}</td>
+                            <td>{{#if description}}{{description}}{{else}}--{{/if}}</td>
+                            <td>{{formatDate updated_at}}</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button
+                                        type="button"
+                                        class="edit-bank-note"
+                                        data-id="{{id}}"
+                                        data-user-name="{{user_name}}"
+                                        data-bank-note-title="{{strategy_name}}"
+                                        data-description="{{description}}"
+                                    >Edit</button>
+                                    <button type="button" class="delete-bank-note button-danger" data-id="{{id}}">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    {{else}}
+                        <tr>
+                            <td colspan="6">No bank notes yet. Create your first one using the form.</td>
+                        </tr>
+                    {{/if}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="/js/strategiesCrud.js"></script>

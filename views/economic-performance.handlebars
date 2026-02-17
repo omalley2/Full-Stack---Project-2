@@ -1,0 +1,170 @@
+<style>
+    .card h2 {
+        margin-bottom: 0.75rem;
+    }
+
+    .card h2 + .control-row,
+    .card h2 + .section-subtext {
+        margin-top: 0;
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .kpi-card {
+        background: #f8fbff;
+        border: 1px solid #e6edf7;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .kpi-label {
+        color: #3a4b5c;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+    }
+
+    .kpi-value {
+        font-size: 1.5rem;
+        font-weight: 400;
+        color: #152231;
+    }
+
+    .control-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+        margin-top: 1rem;
+    }
+
+    .control-row label {
+        font-weight: 700;
+        color: #2c3e50;
+        font-size: 0.95rem;
+    }
+
+    .control-row > div {
+        display: flex;
+        flex-direction: column;
+        width: 220px;
+    }
+
+    .control-row select {
+        width: 100%;
+    }
+
+    .control-row-tight {
+        margin-top: 0;
+        margin-bottom: 0.75rem;
+        gap: 1rem;
+        align-items: end;
+        flex-wrap: wrap;
+    }
+
+    .control-row-dates {
+        margin-top: 0;
+        margin-bottom: 0.75rem;
+        gap: 1rem;
+        align-items: end;
+        flex-wrap: wrap;
+    }
+
+    .chart-wrap {
+        position: relative;
+        height: 340px;
+    }
+
+    .chart-wrap-rhythm {
+        margin-top: 0.75rem;
+    }
+
+    .section-subtext {
+        color: #5d6d7e;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .asof-note {
+        color: #5d6d7e;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .asof-note-economic {
+        margin-top: 0.75rem;
+    }
+</style>
+
+<div class="card">
+    <h2>🇺🇸 US Economic Performance</h2>
+    <p>Track key US macroeconomic performance and trend behavior over time.</p>
+</div>
+
+<div class="card" id="economic-dashboard-root-page">
+    <h2>Economic Dashboard Metrics</h2>
+    <div class="control-row control-row-tight" style="margin-top: 0.75rem;">
+        <div>
+            <label for="economic-date">Date</label>
+            <select id="economic-date"></select>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">GDP Growth (Latest Quarter)</div>
+            <div class="kpi-value" id="kpi-gdp-latest">--</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">GDP Growth QoQ Change</div>
+            <div class="kpi-value" id="kpi-gdp-qoq">--</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">GDP Growth YoY Change</div>
+            <div class="kpi-value" id="kpi-gdp-yoy">--</div>
+        </div>
+    </div>
+
+    <p id="kpi-economic-asof-note" class="asof-note asof-note-economic">
+        * GDP values are quarterly; as-of date will display after data loads.
+    </p>
+</div>
+
+<div class="card">
+    <h2>Trend Analysis</h2>
+    <p class="section-subtext">Line chart trend view for selected US economic metric</p>
+
+    <div class="control-row control-row-tight">
+        <div>
+            <label for="trend-analysis-metric">Metric</label>
+            <select id="trend-analysis-metric">
+                <option value="gdp_growth" selected>GDP Trend</option>
+                <option value="unemployment_rate">Unemployment Rate</option>
+                <option value="fed_funds_rate">Fed Funds Rate</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="control-row control-row-dates">
+        <div>
+            <label for="economic-chart-start-date">Start Date</label>
+            <select id="economic-chart-start-date"></select>
+        </div>
+        <div>
+            <label for="economic-chart-end-date">End Date</label>
+            <select id="economic-chart-end-date"></select>
+        </div>
+    </div>
+
+    <div class="chart-wrap chart-wrap-rhythm">
+        <canvas id="gdpTrendChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/js/economicDashboard.js"></script>
